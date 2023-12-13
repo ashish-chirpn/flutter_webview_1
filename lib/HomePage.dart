@@ -4,9 +4,35 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 class HomePage extends StatelessWidget
 {
+
   @override
   Widget build(BuildContext context)
   {
+    Future<bool> showExitPopup() async {
+      return await showDialog( //show confirm dialogue
+        //the return value will be from "Yes" or "No" options
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Exit App'),
+          content: Text('Do you want to exit an App?'),
+          actions:[
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              //return false when click on "NO"
+              child:Text('No'),
+            ),
+
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              //return true when click on "Yes"
+              child:Text('Yes'),
+            ),
+
+          ],
+        ),
+      )??false; //if showDialouge had returned null, then return false
+    }
+
     WebViewController controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
@@ -27,52 +53,11 @@ class HomePage extends StatelessWidget
         ),
       )
       ..loadRequest(Uri.parse('https://utillz1.web3bharat.xyz/'));
-    return Scaffold(
-        //drawer: AppDrawer(),
-        // appBar: AppBar(
-        //   elevation: 2,
-        //   backgroundColor: primaryColor,
-        //   title: Column(
-        //     crossAxisAlignment: CrossAxisAlignment.start,
-        //     children: [
-        //       Obx(() {
-        //         return Text(
-        //           //AppConstant.appName,
-        //           getTitle(controller.currentIndex.value),
-        //           style: const TextStyle(color: Colors.white, fontSize: 20),
-        //         );
-        //       }),
-        //       const SizedBox(height: 5),
-        //       Obx(() {
-        //         return Text(
-        //           profileController.userName.value,
-        //           style: const TextStyle(
-        //               fontSize: 12, color: Colors.white),
-        //         );
-        //       })
-        //     ],
-        //   ),
-        //   leading: IconButton(
-        //     icon: const FaIcon(FontAwesomeIcons.alignLeft),
-        //     onPressed: () => {_scaffoldKey.currentState!.openDrawer()},
-        //   ),
-        //   actions: [
-        //     IconButton(
-        //         onPressed: () => {Get.toNamed("/patient-message")},
-        //         icon: const Icon(
-        //           Icons.notifications,
-        //           color: Colors.white,
-        //         )),
-        //     IconButton(
-        //         onPressed: () => {},
-        //         icon: const Icon(
-        //           Icons.exit_to_app,
-        //           color: Colors.white,
-        //         ))
-        //   ],
-        // ),
-        body: WebViewWidget(controller: controller),
+    return WillPopScope(
+      onWillPop: showExitPopup,
+      child: Scaffold(
+          body: WebViewWidget(controller: controller),
+      ),
     );
   }
-
 }
